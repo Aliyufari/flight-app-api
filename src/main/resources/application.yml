@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: flight
+  security:
+    jwt:
+      secret: Y29tZWRpZmZpY3VsdGZlYXJicmVhdGhlY2hhcmFjdGVyaXN0aWNzb21lY291bGR3b29kZWZmZWN0c2hldW5kZXJuZWFyYnlzdGlsbHNpbXBsZXN0cG9ja2V0em9vc3RhcnRldmVyeWNvbG9ydGhpbnBhY2twYXJ0eXBsdXJhbG5vdGV2ZW5pbmd0aHJvd2xpdmVub3N0b3ZlcHV0aHVudGdyZXdicm9rZWZlZWRvd25rZXllYWdlcnVudGlsZmFpcmx5ZG9nd29vbGhhcmRlcnJpY2hzdGlmZmV4aXN0ZGF1Z2h0ZXJpdHN1bml0YWR2aWNlZGVhcmFoZWFkcmh5dA==
+      expiration: 3600000
+      issuer: AFGICAFE
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flight_app_db
+    username: postgres
+    password: myPass
+  jpa:
+    hibernate:
+      ddl-auto: update
+
