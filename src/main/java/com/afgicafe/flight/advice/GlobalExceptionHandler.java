@@ -19,9 +19,6 @@ public class GlobalExceptionHandler {
     private final PropertyNamingStrategies.SnakeCaseStrategy strategy =
             new PropertyNamingStrategies.SnakeCaseStrategy();
 
-    // ==============================
-    // VALIDATION ERROR (DTO @Valid)
-    // ==============================
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
 
@@ -45,9 +42,6 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    // ==============================
-    // BAD REQUEST
-    // ==============================
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiErrorResponse> handleBadRequest(BadRequestException ex) {
 
@@ -61,9 +55,6 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    // ==============================
-    // UNAUTHORIZED (LOGIN FAIL ETC)
-    // ==============================
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiErrorResponse> handleUnauthorized(UnauthorizedException ex) {
 
@@ -77,9 +68,6 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    // ==============================
-    // ACCOUNT LOCKED
-    // ==============================
     @ExceptionHandler(AccountLockedException.class)
     public ResponseEntity<ApiErrorResponse> handleAccountLocked(AccountLockedException ex) {
 
@@ -93,9 +81,6 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    // ==============================
-    // RESOURCE NOT FOUND
-    // ==============================
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(ResourceNotFoundException ex) {
 
@@ -109,9 +94,6 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    // ==============================
-    // ACCESS DENIED (Spring Security)
-    // ==============================
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ApiErrorResponse> handleAccessDenied(Exception ex) {
 
@@ -121,13 +103,10 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.FORBIDDEN)
                 .body(ApiErrorResponse.of(
                         HttpStatus.FORBIDDEN,
-                        "You do not have permission to access this resource"
+                        "Access denied"
                 ));
     }
 
-    // ==============================
-    // ILLEGAL ARGUMENT (fallback bad input)
-    // ==============================
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
 
@@ -141,9 +120,6 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    // ==============================
-    // GENERAL EXCEPTION (CATCH ALL)
-    // ==============================
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGeneral(Exception ex) {
 

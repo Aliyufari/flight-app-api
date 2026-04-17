@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequestException("Phone number already exists");
         }
 
-        Role role = roleRepository.findByName(RoleEnum.CUSTOMER)
+        Role role = roleRepository.findByName(RoleEnum.ADMIN)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
         User user = mapper.toEntity(request);

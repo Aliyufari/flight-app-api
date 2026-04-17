@@ -35,8 +35,13 @@ public class EmailVerification extends BaseEntity {
 
     public EmailVerification(User user) {
         this.user = user;
+        regenerateToken();
+    }
+
+    public void regenerateToken() {
+        this.token = UUID.randomUUID().toString();
         this.createdAt = LocalDateTime.now();
         this.expiresAt = createdAt.plusMinutes(15);
-        this.token = UUID.randomUUID().toString();
+        this.verified = false;
     }
 }

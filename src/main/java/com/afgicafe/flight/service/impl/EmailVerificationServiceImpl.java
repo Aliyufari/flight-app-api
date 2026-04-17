@@ -73,7 +73,10 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             throw new BadRequestException("Account already verified");
         }
 
-        EmailVerification verification = new EmailVerification(user);
+        EmailVerification verification = repository.findByUser(user)
+                .orElseGet(() -> new EmailVerification(user));
+
+        verification.regenerateToken();
         repository.save(verification);
 
         emailEventPublisher.publish(
