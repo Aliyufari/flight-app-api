@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -57,7 +56,7 @@ public record UserResponse(
         @JsonProperty("date_of_birth")
         LocalDate dateOfBirth,
 
-        Set<RoleResponse> roles,
+        RoleResponse role,
 
         Status status
 ) {}

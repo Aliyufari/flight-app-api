@@ -31,7 +31,8 @@ public class OpenApiConfig {
                 )
                 .tags(
                         List.of(
-                                new Tag().name("Authentication").description("Login & Registration Routes")
+                                new Tag().name("Authentication").description("Login & Registration Routes"),
+                                new Tag().name("Verification").description("User account verification")
 //                                new Tag().name("Users").description("User management APIs"),
 //                                new Tag().name("Roles").description("Role management APIs"),
 //                                new Tag().name("Flights").description("Flight operations APIs")

@@ -1,10 +1,7 @@
 package com.afgicafe.flight.advice;
 
-import com.afgicafe.flight.exception.AccountLockedException;
-import com.afgicafe.flight.exception.BadRequestException;
-import com.afgicafe.flight.exception.ResourceNotFoundException;
-import com.afgicafe.flight.exception.UnauthorizedException;
-import com.afgicafe.flight.utils.ApiResponse;
+import com.afgicafe.flight.exception.*;
+import com.afgicafe.flight.utils.ApiErrorResponse;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,10 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -25,8 +19,11 @@ public class GlobalExceptionHandler {
     private final PropertyNamingStrategies.SnakeCaseStrategy strategy =
             new PropertyNamingStrategies.SnakeCaseStrategy();
 
+    // ==============================
+    // VALIDATION ERROR (DTO @Valid)
+    // ==============================
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, List<String>>>> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
 
         Map<String, List<String>> errors = new HashMap<>();
 
@@ -34,71 +31,129 @@ public class GlobalExceptionHandler {
             String field = strategy.translate(error.getField());
             String message = error.getDefaultMessage();
 
-            errors.computeIfAbsent(field, key -> new ArrayList<>())
-                    .add(message);
+            errors.computeIfAbsent(field, k -> new ArrayList<>()).add(message);
         });
 
         log.warn("Validation failed: {}", errors);
 
-        ApiResponse<Map<String, List<String>>> response =
-                ApiResponse.error(
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of(
                         HttpStatus.BAD_REQUEST,
                         "Validation error",
-                        "errors",
                         errors
-                );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                ));
     }
 
+    // ==============================
+    // BAD REQUEST
+    // ==============================
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiResponse<Object>> handleBadRequest(BadRequestException ex) {
+    public ResponseEntity<ApiErrorResponse> handleBadRequest(BadRequestException ex) {
 
         log.warn("Bad request: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(ex.getMessage()));
+                .body(ApiErrorResponse.of(
+                        HttpStatus.BAD_REQUEST,
+                        ex.getMessage()
+                ));
     }
 
+    // ==============================
+    // UNAUTHORIZED (LOGIN FAIL ETC)
+    // ==============================
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ApiResponse<Object>> handleUnauthorized(UnauthorizedException ex) {
+    public ResponseEntity<ApiErrorResponse> handleUnauthorized(UnauthorizedException ex) {
 
         log.warn("Unauthorized access: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error(ex.getMessage()));
+                .body(ApiErrorResponse.of(
+                        HttpStatus.UNAUTHORIZED,
+                        ex.getMessage()
+                ));
     }
 
+    // ==============================
+    // ACCOUNT LOCKED
+    // ==============================
     @ExceptionHandler(AccountLockedException.class)
-    public ResponseEntity<ApiResponse<Object>> handleAccountLocked(AccountLockedException ex) {
+    public ResponseEntity<ApiErrorResponse> handleAccountLocked(AccountLockedException ex) {
 
         log.warn("Account locked: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.LOCKED)
-                .body(ApiResponse.error(ex.getMessage()));
+                .body(ApiErrorResponse.of(
+                        HttpStatus.LOCKED,
+                        ex.getMessage()
+                ));
     }
 
+    // ==============================
+    // RESOURCE NOT FOUND
+    // ==============================
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Object>> handleNotFound(ResourceNotFoundException ex) {
+    public ResponseEntity<ApiErrorResponse> handleNotFound(ResourceNotFoundException ex) {
 
         log.warn("Resource not found: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error(ex.getMessage()));
+                .body(ApiErrorResponse.of(
+                        HttpStatus.NOT_FOUND,
+                        ex.getMessage()
+                ));
     }
 
+    // ==============================
+    // ACCESS DENIED (Spring Security)
+    // ==============================
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccessDenied(Exception ex) {
 
+        log.warn("Access denied: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiErrorResponse.of(
+                        HttpStatus.FORBIDDEN,
+                        "You do not have permission to access this resource"
+                ));
+    }
+
+    // ==============================
+    // ILLEGAL ARGUMENT (fallback bad input)
+    // ==============================
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+
+        log.warn("Illegal argument: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of(
+                        HttpStatus.BAD_REQUEST,
+                        ex.getMessage()
+                ));
+    }
+
+    // ==============================
+    // GENERAL EXCEPTION (CATCH ALL)
+    // ==============================
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleGeneral(Exception ex) {
+    public ResponseEntity<ApiErrorResponse> handleGeneral(Exception ex) {
 
         log.error("Unhandled exception occurred", ex);
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("Something went wrong"));
+                .body(ApiErrorResponse.of(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Something went wrong. Please contact support."
+                ));
     }
 }

@@ -10,7 +10,6 @@ import org.hibernate.annotations.NaturalId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -111,13 +110,9 @@ public class User extends SoftDeletableEntity {
     )
     private LocalDate dateOfBirth;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "role_user",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

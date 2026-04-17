@@ -4,6 +4,7 @@ import com.afgicafe.flight.domain.entity.EmailVerification;
 import com.afgicafe.flight.domain.entity.User;
 import com.afgicafe.flight.domain.enums.Status;
 import com.afgicafe.flight.domain.event.EmailVerificationEvent;
+import com.afgicafe.flight.dto.request.ResendVerificationRequest;
 import com.afgicafe.flight.event.publisher.EmailEventPublisher;
 import com.afgicafe.flight.exception.BadRequestException;
 import com.afgicafe.flight.exception.ResourceNotFoundException;
@@ -54,6 +55,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         User user = verification.getUser();
 
         user.setStatus(Status.ACTIVE);
+        user.setEmailVerifiedAt(LocalDateTime.now());
         userRepository.save(user);
 
         verification.setVerified(true);
@@ -62,9 +64,9 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     @Override
     @Transactional
-    public void resendVerification(String email) {
+    public void resendVerification(ResendVerificationRequest request) {
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (user.getStatus() == Status.ACTIVE) {

@@ -1,13 +1,14 @@
 package com.afgicafe.flight.utils;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
+@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "time_stamp",
@@ -17,104 +18,44 @@ import java.util.Map;
         "data"
 })
 public class ApiResponse<T> {
-    @Getter
-    private String status;
-    @Getter
-    @JsonProperty("status_code")
-    private int statusCode;
-    @Getter
-    private String message;
-    private final Map<String, T> data = new HashMap<>();
-    @Getter
-    @JsonProperty("time_stamp")
+
+    private final String status;
+
+    private final int statusCode;
+
+    private final String message;
+
+    private T data;
+
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss a")
-    private LocalDateTime timeStamp;
+    private final LocalDateTime timeStamp;
 
-    public ApiResponse(
-            String status,
-            HttpStatus statusCode,
-            String message,
-            LocalDateTime timeStamp,
-            String key,
-            T value
-    ){
-        this.status = status;
-        this.statusCode = statusCode.value();
+    private ApiResponse(HttpStatus status, String message) {
+        this.timeStamp = LocalDateTime.now();
+        this.status = status.name();
+        this.statusCode = status.value();
         this.message = message;
-        if (key != null){this.data.put(key, value);}
-        this.timeStamp = timeStamp;
     }
 
-    public static <T> ApiResponse<T> success(
-            HttpStatus statusCode,
-            String msg,
-            String key,
-            T value
-    ){
-        return new ApiResponse<>(
-                statusCode.name(),
-                statusCode,
-                msg,
-                LocalDateTime.now(),
-                key,
-                value
-        );
+    private ApiResponse(HttpStatus status, String message, T data) {
+        this.timeStamp = LocalDateTime.now();
+        this.status = status.name();
+        this.statusCode = status.value();
+        this.message = message;
+        this.data = data;
     }
 
-    public static <T> ApiResponse<T> ok( String msg){
-        return new ApiResponse<>(
-                HttpStatus.OK.name(),
-                HttpStatus.OK,
-                msg,
-                LocalDateTime.now(),
-                null,
-                null
-        );
+    // HttpStatus always 200 no data only message
+    public static <T> ApiResponse<T> ok(String message) {
+        return new ApiResponse<>(HttpStatus.OK, message);
     }
 
-    public static <T> ApiResponse<T> error(
-            HttpStatus statusCode,
-            String msg,
-            String key,
-            T value
-    ){
-        return new ApiResponse<>(
-                statusCode.name(),
-                statusCode,
-                msg,
-                LocalDateTime.now(),
-                key,
-                value
-        );
+    // Parse HttpStatus by yourself no data only message
+    public static <T> ApiResponse<T> success(HttpStatus status, String message) {
+        return new ApiResponse<>(status, message);
     }
 
-
-    public static <T> ApiResponse<T> error(HttpStatus statusCode, String msg){
-        return new ApiResponse<>(
-                statusCode.name(),
-                statusCode,
-                msg,
-                LocalDateTime.now(),
-                null,
-                null
-        );
+    public static <T> ApiResponse<T> success(HttpStatus status, String message, T data) {
+        return new ApiResponse<>(status, message, data);
     }
-
-    public static <T> ApiResponse<T> error(String msg){
-        return new ApiResponse<>(
-                HttpStatus.INTERNAL_SERVER_ERROR.name(),
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                msg,
-                LocalDateTime.now(),
-                null,
-                null
-        );
-    }
-
-    @JsonAnyGetter
-    public Map<String, T> getData() {
-        return data;
-    }
-
 }
-

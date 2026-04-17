@@ -1,25 +1,27 @@
 package com.afgicafe.flight.service.impl;
 
+import com.afgicafe.flight.domain.entity.RefreshToken;
 import com.afgicafe.flight.domain.entity.Role;
 import com.afgicafe.flight.domain.entity.User;
 import com.afgicafe.flight.domain.enums.RoleEnum;
 import com.afgicafe.flight.domain.enums.Status;
 import com.afgicafe.flight.dto.request.LoginRequest;
+import com.afgicafe.flight.dto.request.RefreshRequest;
 import com.afgicafe.flight.dto.request.RegisterRequest;
 import com.afgicafe.flight.dto.response.LoginResponse;
-import com.afgicafe.flight.email.service.EmailService;
+import com.afgicafe.flight.dto.response.TokenResponse;
 import com.afgicafe.flight.exception.AccountLockedException;
 import com.afgicafe.flight.exception.BadRequestException;
 import com.afgicafe.flight.exception.ResourceNotFoundException;
 import com.afgicafe.flight.exception.UnauthorizedException;
 import com.afgicafe.flight.mapper.UserMapper;
-import com.afgicafe.flight.repository.EmailVerificationRepository;
 import com.afgicafe.flight.repository.RoleRepository;
 import com.afgicafe.flight.repository.UserRepository;
 import com.afgicafe.flight.security.JwtService;
 import com.afgicafe.flight.security.UserPrincipal;
 import com.afgicafe.flight.service.AuthService;
 import com.afgicafe.flight.service.EmailVerificationService;
+import com.afgicafe.flight.service.RefreshTokenService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,6 +45,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final EmailVerificationService emailVerificationService;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     @Transactional
@@ -62,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         User user = mapper.toEntity(request);
         user.setEmail(request.getEmail().toLowerCase().trim());
         user.setPhoneNumber(request.getPhoneNumber().trim());
-        user.setRoles(Set.of(role));
+        user.setRole(role);
         user.setStatus(Status.PENDING);
         user.setPassword(encoder.encode(request.getPassword()));
 
@@ -105,11 +108,12 @@ public class AuthServiceImpl implements AuthService {
 
             userRepository.save(user);
 
+            RefreshToken refreshToken = refreshTokenService.create(user);
             final String accessToken = jwtService.generateAccessToken(principal);
 
             return LoginResponse.builder()
                     .user(mapper.toResponse(user))
-                    .accessToken(accessToken)
+                    .tokens(new TokenResponse(accessToken, refreshToken.getToken()))
                     .build();
 
         } catch (BadCredentialsException ex) {
@@ -125,5 +129,25 @@ public class AuthServiceImpl implements AuthService {
 
             throw new UnauthorizedException("Invalid credentials");
         }
+    }
+
+    @Override
+    @Transactional
+    public LoginResponse refresh(RefreshRequest request) {
+
+        RefreshToken oldRefreshToken = refreshTokenService.validate(request.getRefreshToken());
+
+        User user = oldRefreshToken.getUser();
+
+        refreshTokenService.deleteByUser(user);
+
+        RefreshToken newRefreshToken = refreshTokenService.create(user);
+
+        UserPrincipal principal = new UserPrincipal(user);
+        String accessToken = jwtService.generateAccessToken(principal);
+
+        return LoginResponse.builder()
+                .tokens(new TokenResponse(accessToken, newRefreshToken.getToken()))
+                .build();
     }
 }

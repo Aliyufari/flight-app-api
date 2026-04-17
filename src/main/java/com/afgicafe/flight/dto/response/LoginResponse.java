@@ -9,8 +9,5 @@ import lombok.Builder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record LoginResponse(
         UserResponse user,
-
-        @Schema(example = "eyJhbGciOiJIUzI1NiIsInR5cCI6kpXVCJ9...")
-        @JsonProperty("access_token")
-        String accessToken
+        TokenResponse tokens
 ) {}

@@ -1,16 +1,18 @@
 package com.afgicafe.flight.security;
 
 import com.afgicafe.flight.domain.entity.User;
+import com.afgicafe.flight.domain.enums.Status;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor
@@ -20,10 +22,19 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles()
-                .stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-                .toList();
+        Set<GrantedAuthority> authorities = new HashSet<>();
+
+        if (user.getRole() != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
+
+            if (user.getRole().getPermissions() != null) {
+                user.getRole().getPermissions().forEach(permission ->
+                        authorities.add(new SimpleGrantedAuthority(permission.getValue()))
+                );
+            }
+        }
+
+        return authorities;
     }
 
     @Override
@@ -43,7 +54,8 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return user.getLockedUntil() == null
+                || user.getLockedUntil().isBefore(LocalDateTime.now());
     }
 
     @Override
@@ -53,6 +65,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getStatus() == Status.ACTIVE
+                && user.getEmailVerifiedAt() != null;
     }
 }
