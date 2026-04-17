@@ -1,0 +1,24 @@
+#Server
+SERVER_PORT: 8080
+
+#Profile
+ACTIVE_PROFILE: dev
+
+#Database
+DB_HOST: localhost
+DB_PORT: 5432
+DB_NAME: flight_app_db
+DB_USERNAME: postgres
+DB_PASSWORD: myPass
+
+#JWT Config
+JWT_ISSUER: AFGICAFE
+JWT_SECRET: Y29tZWRpZmZpY3VsdGZlYXJicmVhdGhlY2hhcmFjdGVyaXN0aWNzb21lY291bGR3b29kZWZmZWN0c2hldW5kZXJuZWFyYnlzdGlsbHNpbXBsZXN0cG9ja2V0em9vc3RhcnRldmVyeWNvbG9ydGhpbnBhY2twYXJ0eXBsdXJhbG5vdGV2ZW5pbmd0aHJvd2xpdmVub3N0b3ZlcHV0aHVudGdyZXdicm9rZWZlZWRvd25rZXllYWdlcnVudGlsZmFpcmx5ZG9nd29vbGhhcmRlcnJpY2hzdGlmZmV4aXN0ZGF1Z2h0ZXJpdHN1bml0YWR2aWNlZGVhcmFoZWFkcmh5dA==
+JWT_EXPIRATION: 3600000
+
+#Email Config
+EMAIL_HOST: smtp.gmail.com
+EMAIL_PORT: 465
+EMAIL_ID: aliyufariglobal@gmail.com
+EMAIL_PASSWORD: pbvyfbvndwdyfynp
+VERIFY_EMAIL_HOST: http://localhost:${SERVER_PORT}

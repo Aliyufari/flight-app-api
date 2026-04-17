@@ -12,10 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Authentication")
 @RestController
@@ -30,12 +27,13 @@ public class AuthController {
             description = "User registration route"
     )
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserResponse>> register (@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<?>> register (@Valid @RequestBody RegisterRequest request) {
+        service.register(request);
         var response = ApiResponse.success(
                 HttpStatus.CREATED,
-                "User registered successfully",
-                "user",
-                service.register(request)
+                "Registered successfully, please check your email to verify your account.",
+                null,
+                null
         );
 
         return ResponseEntity

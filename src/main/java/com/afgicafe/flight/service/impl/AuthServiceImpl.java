@@ -7,17 +7,19 @@ import com.afgicafe.flight.domain.enums.Status;
 import com.afgicafe.flight.dto.request.LoginRequest;
 import com.afgicafe.flight.dto.request.RegisterRequest;
 import com.afgicafe.flight.dto.response.LoginResponse;
-import com.afgicafe.flight.dto.response.UserResponse;
+import com.afgicafe.flight.email.service.EmailService;
 import com.afgicafe.flight.exception.AccountLockedException;
 import com.afgicafe.flight.exception.BadRequestException;
 import com.afgicafe.flight.exception.ResourceNotFoundException;
 import com.afgicafe.flight.exception.UnauthorizedException;
 import com.afgicafe.flight.mapper.UserMapper;
+import com.afgicafe.flight.repository.EmailVerificationRepository;
 import com.afgicafe.flight.repository.RoleRepository;
 import com.afgicafe.flight.repository.UserRepository;
 import com.afgicafe.flight.security.JwtService;
 import com.afgicafe.flight.security.UserPrincipal;
 import com.afgicafe.flight.service.AuthService;
+import com.afgicafe.flight.service.EmailVerificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,19 +40,19 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final UserMapper mapper;
     private final PasswordEncoder encoder;
-
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
+    private final EmailVerificationService emailVerificationService;
 
     @Override
     @Transactional
-    public UserResponse register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
 
-        if (userRepository.existsByEmail(request.getEmail().toLowerCase().trim())){
+        if (userRepository.existsByEmail(request.getEmail().toLowerCase().trim())) {
             throw new BadRequestException("Email already exists");
         }
 
-        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())){
+        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             throw new BadRequestException("Phone number already exists");
         }
 
@@ -64,9 +66,9 @@ public class AuthServiceImpl implements AuthService {
         user.setStatus(Status.PENDING);
         user.setPassword(encoder.encode(request.getPassword()));
 
-        var savedUser = userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        return mapper.toResponse(savedUser);
+        emailVerificationService.createVerification(savedUser);
     }
 
     @Override
@@ -84,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if (user.getStatus() != Status.ACTIVE) {
-            throw new UnauthorizedException("Account is not active");
+            throw new UnauthorizedException("Please verify your email before logging in");
         }
 
         try {
@@ -121,7 +123,7 @@ public class AuthServiceImpl implements AuthService {
 
             userRepository.save(user);
 
-            throw new RuntimeException("Invalid credentials");
+            throw new UnauthorizedException("Invalid credentials");
         }
     }
 }

@@ -2,7 +2,6 @@ package com.afgicafe.flight.domain.entity;
 
 import com.afgicafe.flight.domain.enums.Currency;
 import com.afgicafe.flight.domain.enums.Gender;
-import com.afgicafe.flight.domain.enums.RoleEnum;
 import com.afgicafe.flight.domain.enums.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -112,7 +111,7 @@ public class User extends SoftDeletableEntity {
     )
     private LocalDate dateOfBirth;
 
-    @ManyToMany(targetEntity = RoleEnum.class, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_user",
             joinColumns = @JoinColumn(name = "user_id"),
