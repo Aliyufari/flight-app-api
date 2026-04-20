@@ -23,29 +23,29 @@ public class UserSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        log.info("Seeding ADMIN user...");
+        log.info("Seeding user...");
 
-        String adminEmail = "admin@afgicafe.com";
+        String adminEmail = "lawalaji@email.com";
 
         if (userRepository.findByEmail(adminEmail).isPresent()) {
-            log.info("ADMIN user already exists");
+            log.info("User already exists");
             return;
         }
 
         Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
-                .orElseThrow(() -> new RuntimeException("ADMIN role not found"));
+                .orElseThrow(() -> new RuntimeException("Role not found"));
 
         User admin = new User();
-        admin.setFirstName("Super");
-        admin.setLastName("Admin");
+        admin.setFirstName("Lawal");
+        admin.setLastName("Aji");
         admin.setEmail(adminEmail);
-        admin.setPhoneNumber("0000000000");
+        admin.setPhoneNumber("09023456789");
         admin.setPassword(passwordEncoder.encode("password"));
         admin.setRole(adminRole);
         admin.setStatus(Status.ACTIVE);
 
         userRepository.save(admin);
 
-        log.info("ADMIN user created successfully");
+        log.info("User created successfully");
     }
 }
