@@ -21,4 +21,4 @@ EMAIL_HOST: smtp.gmail.com
 EMAIL_PORT: 587
 EMAIL_ID: aliyufariglobal@gmail.com
 EMAIL_PASSWORD: oeevrfnntudketnm
-VERIFY_EMAIL_HOST: http://localhost:${SERVER_PORT}
+VERIFY_EMAIL_HOST: https://fly-swift-chat.lovable.app
