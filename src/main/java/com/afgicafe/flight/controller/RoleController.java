@@ -28,7 +28,7 @@ public class RoleController {
             description = "Paginated role list route"
     )
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') and hasAuthority('role:view')")
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('view:role')")
     public ResponseEntity<ApiResponse<Page<RoleResponse>>> index (Pageable pageable) {
         return ResponseEntity.ok(
                 ApiResponse.success(
