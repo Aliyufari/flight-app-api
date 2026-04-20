@@ -113,6 +113,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>flight-app-api</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

@@ -1,15 +1,15 @@
 #Server
-SERVER_PORT: 8080
+PORT: 8080
 
 #Profile
-ACTIVE_PROFILE: dev
+ACTIVE_PROFILE: prod
 
 #Database
-DB_HOST: localhost
-DB_PORT: 5432
-DB_NAME: flight_app_db
-DB_USERNAME: postgres
-DB_PASSWORD: myPass
+DB_HOST: aws-0-eu-west-1.pooler.supabase.com
+DB_PORT: 6543
+DB_NAME: postgres
+DB_USERNAME: postgres.mvxbswoncpxetulqidmi
+DB_PASSWORD: A4s3m0A'4U@3031.
 
 #JWT Config
 JWT_ISSUER: AFGICAFE
@@ -20,5 +20,5 @@ JWT_EXPIRATION: 3600000
 EMAIL_HOST: smtp.gmail.com
 EMAIL_PORT: 587
 EMAIL_ID: aliyufariglobal@gmail.com
-EMAIL_PASSWORD:
+EMAIL_PASSWORD: oeevrfnntudketnm
 VERIFY_EMAIL_HOST: http://localhost:${SERVER_PORT}

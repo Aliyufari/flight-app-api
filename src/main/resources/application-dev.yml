@@ -1,5 +1,5 @@
 #Server
-SERVER_PORT: 8080
+PORT: 8080
 
 #Profile
 ACTIVE_PROFILE: dev
@@ -20,5 +20,5 @@ JWT_EXPIRATION: 600000
 EMAIL_HOST: smtp.gmail.com
 EMAIL_PORT: 465
 EMAIL_ID: aliyufariglobal@gmail.com
-EMAIL_PASSWORD: pbvyfbvndwdyfynp
+EMAIL_PASSWORD: oeevrfnntudketnm
 VERIFY_EMAIL_HOST: http://localhost:${SERVER_PORT}
