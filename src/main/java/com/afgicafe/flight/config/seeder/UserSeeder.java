@@ -28,26 +28,30 @@ public class UserSeeder implements CommandLineRunner {
         log.info("Seeding user...");
 
         String adminEmail = "lawalaji@email.com";
-
-        if (userRepository.findByEmail(adminEmail).isPresent()) {
-            log.info("User already exists");
-            return;
-        }
+        String phone = "09023456789";
 
         Role adminRole = roleRepository.findByName(RoleEnum.ADMIN)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
-        User admin = new User();
-        admin.setFirstName("Lawal");
-        admin.setLastName("Aji");
-        admin.setEmail(adminEmail);
-        admin.setPhoneNumber("09023456789");
-        admin.setPassword(passwordEncoder.encode("password"));
-        admin.setRole(adminRole);
-        admin.setStatus(Status.ACTIVE);
+        userRepository.findByEmail(adminEmail)
+                .orElseGet(() -> {
 
-        userRepository.save(admin);
+                    if (userRepository.existsByPhoneNumber(phone)) {
+                        log.warn("Phone number already exists.");
+                        return null;
+                    }
 
-        log.info("User created successfully");
+                    User admin = new User();
+                    admin.setFirstName("Lawal");
+                    admin.setLastName("Aji");
+                    admin.setEmail(adminEmail);
+                    admin.setPhoneNumber(phone);
+                    admin.setPassword(passwordEncoder.encode("password"));
+                    admin.setRole(adminRole);
+                    admin.setStatus(Status.ACTIVE);
+
+                    log.info("User created");
+                    return userRepository.save(admin);
+                });
     }
 }
