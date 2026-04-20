@@ -16,5 +16,10 @@ public class HomeController {
         );
     }
 
-
+    @GetMapping("/health")
+    public ResponseEntity<ApiResponse<?>> health() {
+        return ResponseEntity.ok(
+                ApiResponse.ok("OK")
+        );
+    }
 }
