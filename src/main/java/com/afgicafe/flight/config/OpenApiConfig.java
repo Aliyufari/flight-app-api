@@ -40,8 +40,8 @@ public class OpenApiConfig {
                 )
                 .servers(
                         List.of(
+                                new Server().url("https://flight-app-api.onrender.com/").description("PRODUCTION ENVIRONMENT"),
                                 new Server().url("http://localhost:8080").description("LOCAL ENVIRONMENT")
-//                                new Server().url("http://localhost:8080").description("LOCAL ENVIRONMENT")
                         )
                 )
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth")
