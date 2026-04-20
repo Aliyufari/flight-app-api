@@ -50,7 +50,7 @@ public class UserSeeder implements CommandLineRunner {
                     admin.setRole(adminRole);
                     admin.setStatus(Status.ACTIVE);
 
-                    log.info("User created");
+                    log.info("User created successfully");
                     return userRepository.save(admin);
                 });
     }
