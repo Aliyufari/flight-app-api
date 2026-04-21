@@ -15,7 +15,7 @@ public class Permission extends BaseEntity {
     private PermissionEnum name;
 
     @Column(
-            name = "permission_value",
+//            name = "permission_value",
             unique = true,
             nullable = false
     )
