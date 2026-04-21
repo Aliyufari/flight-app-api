@@ -155,8 +155,6 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = oldRefreshToken.getUser();
-        System.out.println("USER: " + user.getEmail());
-
         refreshTokenService.deleteByUser(user);
 
         RefreshToken newRefreshToken = refreshTokenService.create(user);

@@ -20,17 +20,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshToken create(User user) {
-        try {
-            RefreshToken token = new RefreshToken();
-            token.setUser(user);
-            token.setToken(generateSecureToken());
-            token.setExpiresAt(LocalDateTime.now().plusDays(7));
+        RefreshToken token = new RefreshToken();
+        token.setUser(user);
+        token.setToken(generateSecureToken());
+        token.setExpiresAt(LocalDateTime.now().plusDays(7));
 
-            return repository.save(token);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Refresh token creation failed: " + e.getClass() + " - " + e.getMessage(), e);
-        }
+        return repository.save(token);
     }
 
     @Override
