@@ -35,13 +35,11 @@ public class RefreshToken extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // No used can I delete it?
     public boolean isValid () {
         return !isRevoked() && !isExpired();
     }
 
     public boolean isExpired() {
         return expiresAt.isBefore(LocalDateTime.now());
-
     }
 }

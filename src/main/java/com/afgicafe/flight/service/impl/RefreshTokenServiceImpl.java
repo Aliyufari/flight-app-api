@@ -2,6 +2,7 @@ package com.afgicafe.flight.service.impl;
 
 import com.afgicafe.flight.domain.entity.RefreshToken;
 import com.afgicafe.flight.domain.entity.User;
+import com.afgicafe.flight.exception.ResourceNotFoundException;
 import com.afgicafe.flight.exception.UnauthorizedException;
 import com.afgicafe.flight.repository.RefreshTokenRepository;
 import com.afgicafe.flight.service.RefreshTokenService;
@@ -19,11 +20,17 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public RefreshToken create(User user) {
-        RefreshToken token = new RefreshToken();
-        token.setUser(user);
-        token.setToken(generateSecureToken());
-        token.setExpiresAt(LocalDateTime.now().plusDays(7));
-        return repository.save(token);
+        try {
+            RefreshToken token = new RefreshToken();
+            token.setUser(user);
+            token.setToken(generateSecureToken());
+            token.setExpiresAt(LocalDateTime.now().plusDays(7));
+
+            return repository.save(token);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Refresh token creation failed: " + e.getClass() + " - " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -31,7 +38,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshToken refreshToken = repository.findByToken(token)
                 .orElseThrow(() -> new UnauthorizedException(("Invalid refresh token")));
 
-        if (refreshToken.isExpired()) {
+        if (!refreshToken.isValid()) {
             repository.delete(refreshToken);
             throw new UnauthorizedException("Refresh token expired");
         }

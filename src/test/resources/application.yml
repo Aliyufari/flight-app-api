@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+  flyway:
+    enabled: false
+
+  sql:
+    init:
+      mode: never
+
+  mail:
+    host: localhost
+    port: 1025
+    verify:
+      host: http://localhost:8080
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration
+
+  security:
+    jwt:
+      secret: test-secret-key-for-tests-only
+      expiration: 3600000

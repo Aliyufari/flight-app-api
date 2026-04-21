@@ -51,7 +51,13 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void register(RegisterRequest request) {
 
-        if (userRepository.existsByEmail(request.getEmail().toLowerCase().trim())) {
+        if (request.getEmail() == null) {
+            throw new BadRequestException("Email is required");
+        }
+
+        String email = request.getEmail().toLowerCase().trim();
+
+        if (userRepository.existsByEmail(email)) {
             throw new BadRequestException("Email already exists");
         }
 
@@ -63,15 +69,16 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
         User user = mapper.toEntity(request);
-        user.setEmail(request.getEmail().toLowerCase().trim());
+
+        user.setEmail(email);
         user.setPhoneNumber(request.getPhoneNumber().trim());
         user.setRole(role);
         user.setStatus(Status.PENDING);
         user.setPassword(encoder.encode(request.getPassword()));
 
-        User savedUser = userRepository.save(user);
+        userRepository.save(user);
 
-        emailVerificationService.createVerification(savedUser);
+        emailVerificationService.createVerification(user);
     }
 
     @Override
@@ -135,18 +142,33 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public LoginResponse refresh(RefreshRequest request) {
 
-        RefreshToken oldRefreshToken = refreshTokenService.validate(request.getRefreshToken());
+        String tokenValue = request.getRefreshToken();
+
+        if (tokenValue == null || tokenValue.isBlank()) {
+            throw new BadRequestException("Token is required");
+        }
+
+        RefreshToken oldRefreshToken = refreshTokenService.validate(tokenValue);
+
+        if (oldRefreshToken == null) {
+            throw new UnauthorizedException("Invalid refresh token");
+        }
 
         User user = oldRefreshToken.getUser();
+        System.out.println("USER: " + user.getEmail());
 
         refreshTokenService.deleteByUser(user);
 
         RefreshToken newRefreshToken = refreshTokenService.create(user);
+        if (newRefreshToken == null) {
+            throw new IllegalStateException("Failed to generate refresh token");
+        }
 
         UserPrincipal principal = new UserPrincipal(user);
         String accessToken = jwtService.generateAccessToken(principal);
 
         return LoginResponse.builder()
+                .user(mapper.toResponse(user))
                 .tokens(new TokenResponse(accessToken, newRefreshToken.getToken()))
                 .build();
     }
