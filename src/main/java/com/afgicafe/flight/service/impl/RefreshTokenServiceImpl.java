@@ -24,7 +24,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         token.setUser(user);
         token.setToken(generateSecureToken());
         token.setExpiresAt(LocalDateTime.now().plusDays(7));
-
         return repository.save(token);
     }
 
