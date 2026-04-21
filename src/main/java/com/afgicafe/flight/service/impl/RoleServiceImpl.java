@@ -1,14 +1,13 @@
 package com.afgicafe.flight.service.impl;
 
-import com.afgicafe.flight.domain.entity.Role;
 import com.afgicafe.flight.dto.response.RoleResponse;
 import com.afgicafe.flight.mapper.RoleMapper;
 import com.afgicafe.flight.repository.RoleRepository;
 import com.afgicafe.flight.service.RoleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +17,10 @@ public class RoleServiceImpl implements RoleService {
     private final RoleMapper mapper;
 
     @Override
-    public Page<RoleResponse> getRoles(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+    public List<RoleResponse> getRoles() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 }
