@@ -12,7 +12,7 @@ Base URL
 https://flight-app-api.onrender.com  
 
 Swagger UI  
-https://flight-app-api.onrender.com/swagger-ui/index.html#/  
+https://flight-app-api.onrender.com/swagger-ui/index.html 
 
 You can explore and test all endpoints directly via Swagger.
 
