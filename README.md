@@ -58,7 +58,7 @@ You can explore and test all endpoints directly via Swagger.
 - JWT  
 - JPA / Hibernate  
 - MapStruct  
-- MySQL / PostgreSQL  
+- PostgreSQL  
 - Docker  
 
 ## Why This Project
