@@ -83,4 +83,4 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/Aliyufari/flight-app-api.git
-cd your-repo
+cd flight-app-api
